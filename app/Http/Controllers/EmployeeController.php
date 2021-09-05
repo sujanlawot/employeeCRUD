@@ -136,8 +136,8 @@ class EmployeeController extends Controller
             'gender'=>'required',
             'image'=>'image'            
         ]);
-         $employee=Employee::find($id);
-        
+
+         $employee=Employee::find($id);        
          if($employee->mobilenumber!=$request->input('mobilenumber'))
          {
             $request->validate(['mobilenumber'=>'required|unique:employee,mobilenumber']);
@@ -145,28 +145,22 @@ class EmployeeController extends Controller
          if($employee->email!=$request->input('email'))
          {
                 $request->validate(['email'=>'required|unique:employee,email']);  
-         }
-        
+         }        
          $errmsg=' ';
         //Working with Image
         $file = $request->file('image');
         if($file!="")
         {
             //get filename with extension
-            $filenamewithextension = $file->getClientOriginalName();
-     
+            $filenamewithextension = $file->getClientOriginalName();     
             //get filename without extension
-            $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-     
+            $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);     
             //get file extension
-            $extension = $file->getClientOriginalExtension();
-     
+            $extension = $file->getClientOriginalExtension();     
             //filename to store
-            $filenametostore = $filename.'_'.time().'.'.$extension;
-            
+            $filenametostore = $filename.'_'.time().'.'.$extension;            
             //Move Uploaded File
-            $destinationPath = 'asset/image/employee';
-            
+            $destinationPath = 'asset/image/employee';            
             if(!$file->move($destinationPath,$filenametostore))
             {
                 $filenametostore='';    
@@ -194,29 +188,37 @@ class EmployeeController extends Controller
         $employee->gender=$request->input('gender');
         $employee->address=$request->input('address');
         $employee->image=$filenametostore;
-        $employee->save();         
-         
-        return redirect()->route('employee.index')->with("success","Updated Successfully\n".$errmsg);
-        
+        $employee->save();                  
+        return redirect()->route('employee.index')->with("success","Updated Successfully\n".$errmsg);        
     }
 
-    /**
+    
+    /************
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response****
      */
     public function destroy($id)
     {
+
         $employee = Employee::find($id);
-              if($employee->image!="")
-              {
-                $usersImage = public_path("asset/image/employee/{$employee->image}"); // get previous image from folder
-                if (File::exists($usersImage)) { // unlink or remove previous image from folder
-                    unlink($usersImage);
-                }  
-              }
+        if(isset($employee))
+        {
+            if($employee->image!="")
+          {
+            $usersImage = public_path("asset/image/employee/{$employee->image}"); // get previous image from folder
+            if (File::exists($usersImage)) { // unlink or remove previous image from folder
+                unlink($usersImage);
+            }  
+          }
         $employee->delete();
-        return redirect()->route('employee.index')->with('success','Remove Successfully');
+        return redirect()->route('employee.index')->with('success','Remove Successfully');   
+        }
+        else
+        {
+         return redirect()->route('employee.index')->with('error','No such record Found');      
+         
+        }
     }
 }

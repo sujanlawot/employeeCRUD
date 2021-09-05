@@ -18,3 +18,9 @@ Route::get('/', function () {
 });
 
 Route::resource('employee', EmployeeController::class);
+
+Route::get('/employee/delete/{employee}',[EmployeeController::class,'destroy'])->name('employee.delete');
+
+Route::redirect('/here', '/there',301);
+
+Route::view('/welcome','employee/index');
